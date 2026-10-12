@@ -5,9 +5,10 @@ header{padding:12px;background:#16261d;position:sticky;top:0;z-index:3}
 h1{margin:0 0 8px;font-size:20px;color:#a5d6a7}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 button,select{background:#2e7d32;color:#fff;border:0;border-radius:8px;padding:8px 12px;font-size:15px}
-#grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:12px;max-width:760px;margin:auto}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;padding:12px;max-width:760px;margin:auto}
 .cell{background:#1d3326;border-radius:8px;padding:6px;text-align:center}
 .cell b{display:block;font-size:24px;font-family:"Amiri",serif;color:#ffd54f}
+.lk{font-size:11px;color:#9ab}.lk input{width:auto}
 .cell input{width:100%;box-sizing:border-box;background:#0f1a14;color:#fff;border:1px solid #2e7d32;border-radius:5px;text-align:center;font-size:14px;padding:4px}
 #out{padding:12px 16px 60px;max-width:900px;margin:auto;line-height:1.9;font-size:17px;word-wrap:break-word}
 .sh{color:#81c784;margin:24px 0 6px;font-weight:bold}.n{color:#81c784;font-size:.75em;margin:0 4px}
@@ -31,20 +32,21 @@ const SETS={
 "Greek":"α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ σ τ υ φ χ ψ ω ϝ ϙ ϡ ϻ",
 "Emoji nature":"🌙 ⭐ ☀️ 🌊 🌿 🌸 🍃 🔥 💧 🌍 ⛰️ 🌴 🍇 🍎 🐪 🐝 🕊️ 🐟 🌾 🌹 🍯 🌈 ❄️ ⚡ 🌳 🪨 🌻 🫒",
 "Morse code":".- -... - -.-. --. .... ---.. -.. --.- .-. --.. ... ---- ...-- ..-.. ..- .--- .-.- --. ..-. --.- -.- .-.. -- -. ..... .-- ..",
+"Walmart products (random)":"Great Value Milk|Great Value Eggs|Great Value Bread|Bananas|Strawberries|Avocados|Rotisserie Chicken|Ground Beef|Equate Ibuprofen|Equate Shampoo|Mainstays Towel|Mainstays Pillow|Ozark Trail Tumbler|Ozark Trail Tent|Hyper Tough Hammer|Hyper Tough Drill|Parent's Choice Diapers|Parent's Choice Wipes|Onn TV|Onn Earbuds|Onn Tablet|Paper Towels|Toilet Paper|Tide Pods|Dawn Dish Soap|Clorox Wipes|Lysol Spray|Colgate Toothpaste|Oral-B Toothbrush|Crest Strips|Gatorade|Coca-Cola|Pepsi|Doritos|Lay's Chips|Oreos|Cheerios|Frosted Flakes|Peanut Butter|Strawberry Jam|Spaghetti|Marinara Sauce|Rice|Black Beans|Canned Tuna|Frozen Pizza|Ice Cream|Orange Juice|Coffee|Tea Bags|Honey|Olive Oil|Sugar|Flour|Salt|Ketchup|Mayonnaise|Cheddar Cheese|Butter|Yogurt|Apples|Grapes|Watermelon|Potatoes|Onions|Tomatoes|Lettuce|Carrots|Dog Food|Cat Litter|Bird Seed|Fish Flakes|Charcoal|Propane Tank|Lawn Mower|Garden Hose|Flower Seeds|Potting Soil|Bicycle|Basketball|Soccer Ball|Yoga Mat|Dumbbells|Fishing Rod|Camping Chair|Cooler|Flashlight|AA Batteries|Light Bulbs|Extension Cord|Phone Charger|HDMI Cable|Printer Paper|Notebook|Pencils|Crayons|Backpack|Lunchbox|Water Bottle|Lego Set|Barbie Doll|Hot Wheels|Board Game|Puzzle|Video Game|Nintendo Switch|PlayStation Controller|Xbox Gift Card|Laptop|Smartwatch|Air Fryer|Instant Pot|Blender|Toaster|Microwave|Coffee Maker|Vacuum|Mop|Laundry Basket|Hangers|Bath Mat|Shower Curtain|Bedsheets|Comforter|Mattress|Desk Lamp|Office Chair|Bookshelf|Storage Bins|Picture Frame|Candle|Wall Clock|Rug|Curtains|Sunscreen|Bandages|Vitamins|Allergy Pills|Hand Sanitizer|Deodorant|Razor|Lip Balm|Nail Polish|Hair Dryer|T-Shirt|Jeans|Sneakers|Socks|Hoodie|Baseball Cap|Sunglasses|Winter Jacket|Umbrella|Car Battery|Motor Oil|Windshield Wipers|Tire Inflator|Car Air Freshener|Birthday Cake|Balloons|Gift Bag|Wrapping Paper|Greeting Card|Prayer Rug|Dates|Zamzam Water Bottle|Pita Bread|Hummus|Halal Chicken|Basmati Rice",
 "Planets & sky":"Sun Moon Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune Pluto Comet Star Nova Orion Sirius Vega Lyra Draco Aries Leo Virgo Libra Polaris Altair Deneb Rigel Nebula"};
 const setSel=document.getElementById('set'),grid=document.getElementById('grid'),out=document.getElementById('out');
 Object.keys(SETS).forEach(k=>setSel.innerHTML+=`<option>${k}</option>`);
 Q.forEach(s=>document.getElementById('sura').innerHTML+=`<option value="${s[0]}">${s[0]}. ${s[1]}</option>`);
-const vals=k=>{let s=SETS[k];return typeof s=="string"?s.split(" "):L.map(l=>String(s[l]))};
-grid.innerHTML=L.map((l,i)=>`<div class="cell"><b>${l}</b><input id="g${i}"></div>`).join('');
-const fill=v=>v.forEach((x,i)=>document.getElementById('g'+i).value=x);
+const vals=k=>{let s=SETS[k];if(typeof s!="string")return L.map(l=>String(s[l]));if(s.includes("|"))return shuffle(s.split("|")).slice(0,28);return s.split(" ")};
+grid.innerHTML=L.map((l,i)=>`<div class="cell"><b>${l}</b><input id="g${i}"><label class="lk"><input type="checkbox" id="k${i}">🔒</label></div>`).join('');
+const fill=v=>{const fr=[];v.forEach((x,i)=>{if(!document.getElementById('k'+i).checked)document.getElementById('g'+i).value=x})};
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function render(){const M={};L.forEach((l,i)=>M[l]=document.getElementById('g'+i).value);
-const sep=Object.values(M).some(v=>v.length>1)?"·":"";
+const multi=Object.values(M).some(v=>v.length>1),wordy=Object.values(M).some(v=>/ /.test(v)),sep=wordy?" · ":multi?"·":"",wsep=wordy?"  ⟡  ":" ";
 const sv=+document.getElementById('sura').value;let h='';
 Q.forEach(([n,en,ar,ay])=>{if(sv&&n!=sv)return;h+=`<div class="sh">${n}. ${en} ${ar}</div>`;
-ay.forEach((t,i)=>{h+=t.replace('\ufeff','').split(' ').filter(w=>w&&!/^[ۖۗۘۙۚۛۜ۞۩]$/.test(w)).map(w=>esc([...w].map(c=>M[N[c]||c]).filter(x=>x!==undefined).join(sep))).join(' ')+`<span class="n">(${i+1})</span> `})});
+ay.forEach((t,i)=>{h+=t.replace('\ufeff','').split(' ').filter(w=>w&&!/^[ۖۗۘۙۚۛۜ۞۩]$/.test(w)).map(w=>esc([...w].map(c=>M[N[c]||c]).filter(x=>x!==undefined).join(sep))).join(wsep)+`<span class="n">(${i+1})</span> `})});
 out.innerHTML=h}
 document.getElementById('gen').onclick=()=>{let v=vals(setSel.value);fill(document.getElementById('shuf').checked?shuffle(v):v);render()};
 document.getElementById('apply').onclick=render;setSel.onchange=()=>{fill(vals(setSel.value));render()};
